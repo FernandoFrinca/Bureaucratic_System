@@ -37,10 +37,10 @@ public class GhiseuControler {
     }
 
     @GetMapping("/get")
-    @Operation(
+    /*@Operation(
             summary = "Retrieve all counters (ghisee)",
             description = "Fetches a list of all counters available in the system."
-    )
+    )*/
     public ResponseEntity<List<Ghiseu>> getAllGhisee() {
         List<Ghiseu> ghisee = ghiseuService.getAllGhisee();
         return new ResponseEntity<>(ghisee, HttpStatus.OK);
