@@ -46,7 +46,7 @@ public class GhiseuControler {
         return new ResponseEntity<>(ghisee, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(
             summary = "Delete a counter (ghiseu)",
             description = "Deletes a counter from the system based on the provided ID."

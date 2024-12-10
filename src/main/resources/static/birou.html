@@ -1,33 +1,244 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birouri Management</title>
+    <title>Birou Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        .actions button {
+            background-color: #ff4d4d;
+            margin-left: 5px;
+        }
+
+        .actions button:hover {
+            background-color: #e63946;
+        }
+    </style>
 </head>
 <body>
-<h1>Birouri Management</h1>
+<div class="container">
+    <h1>Birou Management</h1>
 
-<!-- Form for creating a new Birou -->
-<form action="/birou/create" method="post">
-    <label for="id">ID:</label>
-    <input type="number" id="id" name="id" required><br>
-    <label for="nume">Nume:</label>
-    <input type="text" id="nume" name="nume" required><br>
-    <button type="submit">Create Birou</button>
-</form>
 
-<!-- Table displaying all Birouri -->
-<h2>Existing Birouri:</h2>
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Nume</th>
-    </tr>
-    <tr th:each="birou : ${birouri}">
-        <td th:text="${birou.id}"></td>
-        <td th:text="${birou.nume}"></td>
-    </tr>
-</table>
+    <h2>Create a New Birou</h2>
+    <form id="createBirouForm">
+        <label for="nume">Nume Birou:</label>
+        <input type="text" id="nume" name="nume" required><br>
+        <button type="submit">Create Birou</button>
+    </form>
+
+
+    <h2>Existing Birouri</h2>
+    <table id="birouriTable">
+        <tr>
+            <th>ID</th>
+            <th>Nume Birou</th>
+            <th>Actions</th>
+        </tr>
+
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        loadBirouri();
+
+        document.getElementById('createBirouForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            createBirou();
+        });
+    });
+
+    function loadBirouri() {
+        fetch('/birou/get')
+            .then(response => response.json())
+            .then(birouri => {
+                const table = document.getElementById('birouriTable');
+
+                table.querySelectorAll('tr:not(:first-child)').forEach(row => row.remove());
+
+                birouri.forEach(birou => {
+                    const row = document.createElement('tr');
+
+                    const idCell = document.createElement('td');
+                    idCell.textContent = birou.id;
+                    row.appendChild(idCell);
+
+                    const numeCell = document.createElement('td');
+                    numeCell.textContent = birou.nume;
+                    row.appendChild(numeCell);
+
+                    const actionsCell = document.createElement('td');
+                    actionsCell.classList.add('actions');
+
+                    const updateButton = document.createElement('button');
+                    updateButton.textContent = 'Update';
+                    updateButton.onclick = () => updateBirou(birou.id, prompt('Enter new Nume Birou:', birou.nume));
+                    actionsCell.appendChild(updateButton);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = () => deleteBirou(birou.id);
+                    actionsCell.appendChild(deleteButton);
+
+                    row.appendChild(actionsCell);
+
+                    table.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching birouri:', error);
+            });
+    }
+
+    function createBirou() {
+        const nume = document.getElementById('nume').value;
+
+        fetch('/birou/post', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nume })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Birou created successfully.');
+                    loadBirouri();
+                } else {
+                    alert('Failed to create birou. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating birou:', error);
+            });
+    }
+
+    function updateBirou(birouId, newNume) {
+        if (!newNume) {
+            alert('Update canceled.');
+            return;
+        }
+
+        fetch(`/birou/update/${birouId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nume: newNume })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Birou updated successfully.');
+                    loadBirouri();
+                } else {
+                    alert('Failed to update birou. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating birou:', error);
+            });
+    }
+
+    function deleteBirou(birouId) {
+        if (!confirm(`Are you sure you want to delete birou with ID ${birouId}?`)) {
+            return;
+        }
+
+        fetch(`/birou/delete/${birouId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Birou deleted successfully.');
+                    loadBirouri();
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting birou:', error);
+            });
+    }
+</script>
 </body>
 </html>

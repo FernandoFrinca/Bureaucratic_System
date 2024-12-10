@@ -19,23 +19,23 @@ import java.util.Optional;
 @Service
 public class GhiseuService {
 
-    private final GhiseuRepository ghiseuRepository; // Injectăm repository-ul pentru ghiseu
+    private final GhiseuRepository ghiseuRepository;
 
     public GhiseuService(GhiseuRepository ghiseuRepository) {
         this.ghiseuRepository = ghiseuRepository;
     }
 
-    // 1. CREATE - Creare un ghiseu nou
+
     public Ghiseu createGhiseu(Ghiseu ghiseu) {
-        return ghiseuRepository.save(ghiseu);  // Salvează ghiseul în baza de date
+        return ghiseuRepository.save(ghiseu);
     }
 
-    // 2. READ - Obține toate ghișeele
+
     public List<Ghiseu> getAllGhisee() {
-        return ghiseuRepository.findAll();  // Returnează toate ghișeele
+        return ghiseuRepository.findAll();
     }
 
-    // 3. READ - Obține un ghiseu după ID
+
     public Optional<Ghiseu> getGhiseuById(int id) {
         return ghiseuRepository.findById(id);  // Căutăm ghiseul după ID
     }
@@ -53,11 +53,11 @@ public class GhiseuService {
         }
     }*/
 
-    // 5. DELETE - Șterge un ghiseu după ID
+
     public boolean deleteGhiseu(int id) {
-        Optional<Ghiseu> ghiseu = ghiseuRepository.findById(id);  // Căutăm ghiseul
+        Optional<Ghiseu> ghiseu = ghiseuRepository.findById(id);
         if (ghiseu.isPresent()) {
-            ghiseuRepository.delete(ghiseu.get());  // Ștergem ghiseul
+            ghiseuRepository.delete(ghiseu.get());
             return true;
         }
         return false;

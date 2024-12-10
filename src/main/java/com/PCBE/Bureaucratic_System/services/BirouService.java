@@ -18,38 +18,38 @@ public class BirouService {
         this.birouRepository = birouRepository;
     }
 
-    // 1. Create (Creare Birou)
+
     public Birou createBirou(Birou birou) {
         return birouRepository.save(birou);
     }
 
-    // 2. Read (Citire Birou) - Toate birourile
+
     public List<Birou> getAllBirouri() {
         return birouRepository.findAll();
     }
 
-    // 3. Read (Citire Birou) - Birou după ID
+
     public Optional<Birou> getBirouById(int id) {
         return birouRepository.findById(id);
     }
 
-    // 4. Update (Actualizare Birou)
+
     public Birou updateBirou(int id, Birou birou) {
         if (birouRepository.existsById(id)) {
             birou.setId(id);
             return birouRepository.save(birou);
         } else {
-            return null; // Poți arunca o excepție dacă vrei
+            return null;
         }
     }
 
-    // 5. Delete (Ștergere Birou)
+
     public boolean deleteBirou(int id) {
         if (birouRepository.existsById(id)) {
             birouRepository.deleteById(id);
             return true;
         } else {
-            return false; // Poți arunca o excepție dacă vrei
+            return false;
         }
     }
 }

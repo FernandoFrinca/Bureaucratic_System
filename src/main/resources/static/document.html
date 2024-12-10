@@ -100,17 +100,14 @@
 <div class="container">
     <h1>Document Management</h1>
 
-    <!-- Form for creating a new document -->
     <h2>Create a New Document</h2>
     <form id="createForm">
         <label for="tip">Tip Document:</label>
         <input type="text" id="tip" name="tip" required><br>
-        <label for="id">ID:</label>
-        <input type="number" id="id" name="id" required><br>
         <button type="submit">Create Document</button>
     </form>
 
-    <!-- Table of existing documents -->
+
     <h2>Existing Documents</h2>
     <table id="documentsTable">
         <tr>
@@ -118,16 +115,14 @@
             <th>Tip Document</th>
             <th>Actions</th>
         </tr>
-        <!-- Rows will be added here dynamically via JavaScript -->
+
     </table>
 </div>
 
 <script>
-    // Fetch all documents and populate the table
     document.addEventListener('DOMContentLoaded', function () {
         loadDocuments();
 
-        // Add event listener to the create form
         document.getElementById('createForm').addEventListener('submit', function (event) {
             event.preventDefault();
             createDocument();
@@ -140,7 +135,6 @@
             .then(documents => {
                 const table = document.getElementById('documentsTable');
 
-                // Clear existing rows (except the header)
                 table.querySelectorAll('tr:not(:first-child)').forEach(row => row.remove());
 
                 documents.forEach(doc => {
@@ -152,19 +146,16 @@
 
                     const tipCell = document.createElement('td');
                     tipCell.textContent = typeof doc.tip === 'object' && doc.tip.tip ? doc.tip.tip : doc.tip;
-                    //tipCell.textContent = tipValue.replace(/^"|"$/g, '');
                     row.appendChild(tipCell);
 
                     const actionsCell = document.createElement('td');
                     actionsCell.classList.add('actions');
 
-                    // Update button
                     const updateButton = document.createElement('button');
                     updateButton.textContent = 'Update';
                     updateButton.onclick = () => updateDocument(doc.id, prompt('Enter new Tip Document:', doc.tip.tip || doc.tip));
                     actionsCell.appendChild(updateButton);
 
-                    // Delete button
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Delete';
                     deleteButton.onclick = () => deleteDocument(doc.id);
@@ -181,7 +172,6 @@
     }
 
     function createDocument() {
-        const id = document.getElementById('id').value;
         const tip = document.getElementById('tip').value;
 
         fetch('/document/post', {
@@ -189,12 +179,12 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id, tip })
+            body: JSON.stringify({ tip })
         })
             .then(response => {
                 if (response.ok) {
                     alert('Document created successfully.');
-                    loadDocuments(); // Reload documents
+                    loadDocuments();
                 } else {
                     alert('Failed to create document. Please try again.');
                 }
@@ -204,6 +194,7 @@
                 alert('An error occurred. Please try again.');
             });
     }
+
 
     function updateDocument(documentId, newTip) {
         if (!newTip) {
@@ -223,7 +214,7 @@
             .then(response => {
                 if (response.ok) {
                     alert('Document updated successfully.');
-                    loadDocuments(); // Reload documents
+                    loadDocuments();
                 } else {
                     alert('Failed to update document. Please try again.');
                 }
@@ -246,7 +237,7 @@
             .then(response => {
                 if (response.ok) {
                     alert('Document deleted successfully.');
-                    loadDocuments(); // Reload documents
+                    loadDocuments();
                 }
             })
             .catch(error => {

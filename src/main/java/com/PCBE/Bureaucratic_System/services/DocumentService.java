@@ -16,15 +16,15 @@ public class DocumentService {
         this.documentRepository = documentRepository;
     }
 
-    // CREATE: Adăugăm un document nou
+
     public Document addDocument(Document document) {
-        // Salvează documentul în baza de date
-        return documentRepository.save(document);  // Folosește save din JpaRepository
+
+        return documentRepository.save(document);
     }
 
 
     public List<Document> getAllDocuments() {
-        return documentRepository.findAll();  // Folosește findAll din JpaRepository
+        return documentRepository.findAll();
     }
 
 
@@ -33,7 +33,7 @@ public class DocumentService {
         if (documentOptional.isPresent()) {
             Document document = documentOptional.get();
             document.setTip(newTip);
-            documentRepository.save(document);// Salvăm documentul actualizat
+            documentRepository.save(document);
             return document;
         } else {
             System.out.println("Documentul cu ID-ul specificat nu există.");
@@ -41,11 +41,10 @@ public class DocumentService {
         }
     }
 
-    // DELETE: Ștergem un document pe baza ID-ului
     public boolean deleteDocument(int id) {
         Optional<Document> documentOptional = documentRepository.findById(id);
         if (documentOptional.isPresent()) {
-            documentRepository.deleteById(id);  // Folosește deleteById din JpaRepository
+            documentRepository.deleteById(id);
             System.out.println("Document șters cu succes!");
             return true;
         } else {
