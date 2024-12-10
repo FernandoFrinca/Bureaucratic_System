@@ -44,7 +44,7 @@ public class DocumentControler {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDocument);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     @Operation(
             summary = "Update an existing document",
             description = "Updates the type (`tip`) of a specific document identified by its ID."
@@ -54,7 +54,7 @@ public class DocumentControler {
         return document != null ? ResponseEntity.ok(document) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(
             summary = "Delete a document",
             description = "Deletes a document from the system based on the provided ID."

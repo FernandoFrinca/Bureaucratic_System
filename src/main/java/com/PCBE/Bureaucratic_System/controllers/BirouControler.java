@@ -5,6 +5,7 @@ import com.PCBE.Bureaucratic_System.services.BirouService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,5 +66,17 @@ public class BirouControler {
         return isDeleted ?
                 new ResponseEntity<>(HttpStatus.NO_CONTENT) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping
+    public String viewBirouri(Model model) {
+        model.addAttribute("birouri", birouService.getAllBirouri());
+        return "birou";
+    }
+
+    @PostMapping("/create")
+    public String creazaBirou(@ModelAttribute Birou birou) {
+        birouService.createBirou(birou);
+        return "redirect:/birou-ui";
     }
 }

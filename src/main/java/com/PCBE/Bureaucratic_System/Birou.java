@@ -13,7 +13,7 @@ public class Birou {
     private int contorListaGhiseuri = 0;
 
     @OneToMany
-    @JoinColumn(name = "birou_id")
+    @JoinColumn(name = "birou_  id")
     private ArrayList<Ghiseu> lista_ghiseuri_din_birou;
     @jakarta.persistence.Id
     private int id;
