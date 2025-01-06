@@ -1,8 +1,11 @@
 package com.PCBE.Bureaucratic_System;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "birouri")
@@ -12,13 +15,13 @@ public class Birou {
     private final int MAX_CLIENTS = 2;
     private int contorListaGhiseuri = 0;
 
-    @OneToMany
-    @JoinColumn(name = "birou_  id")
-    private ArrayList<Ghiseu> lista_ghiseuri_din_birou;
+    @OneToMany(mappedBy = "birou", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore // Previne includerea în răspunsul JSON
+    private List<Ghiseu> lista_ghiseuri_din_birou;
     @jakarta.persistence.Id
     private int id;
 
-    public Birou(int id, String nume, ArrayList<Ghiseu> lista_ghiseuri_din_birou) {
+    public Birou(int id, String nume, List<Ghiseu> lista_ghiseuri_din_birou) {
         this.id = id;
         this.nume = nume;
         this.lista_ghiseuri_din_birou = lista_ghiseuri_din_birou;
@@ -46,12 +49,12 @@ public class Birou {
         notifyAll();
     }
 
-    public ArrayList<Ghiseu> getLista_ghiseuri_din_birou() {
+    public List<Ghiseu> getLista_ghiseuri_din_birou() {
         return lista_ghiseuri_din_birou;
     }
 
     public boolean obtinereDocumentDeLaGhiseu(Client client) {
-        ArrayList<String> documente = client.getDocumenteNecesare();
+        List<String> documente = client.getDocumenteNecesare();
 
         boolean toateDocumenteleObtinute = true;
 
@@ -87,7 +90,7 @@ public class Birou {
 
                 if (documente.contains(tipDocument) && ghiseu.getStareGhiseu()) {
                     documente.remove(tipDocument);
-                    client.setDocumenteNecesare(documente);
+                    client.setDocumenteNecesare((ArrayList<String>) documente);
                     System.out.println("- "+ client +"-  A fost obținut documentul: " + tipDocument);
                     System.out.println("+ "+ client +"+  Documente rămase: " + documente);
                 }

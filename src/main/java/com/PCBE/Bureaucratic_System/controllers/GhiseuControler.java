@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ghiseu")
@@ -57,4 +59,33 @@ public class GhiseuControler {
                 new ResponseEntity<>(HttpStatus.NO_CONTENT) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping("/requestDocument/{id}")
+    public ResponseEntity<String> requestDocument(@PathVariable int id) {
+        Optional<Ghiseu> optionalGhiseu = ghiseuService.getGhiseuById(id);
+
+        if (optionalGhiseu.isEmpty()) {
+            return new ResponseEntity<>("Ghișeul nu a fost găsit!", HttpStatus.NOT_FOUND);
+        }
+
+        Ghiseu ghiseu = optionalGhiseu.get();
+
+        if (ghiseu.getPauzaPanaLa() != null && LocalDateTime.now().isBefore(ghiseu.getPauzaPanaLa())) {
+            return new ResponseEntity<>("Ghișeul este în pauză până la: " + ghiseu.getPauzaPanaLa(), HttpStatus.BAD_REQUEST);
+        }
+
+        // Incrementare contor de solicitări
+        ghiseu.setSolicitariCount(ghiseu.getSolicitariCount() + 1);
+
+        if (ghiseu.getSolicitariCount() >= 5) {
+            ghiseu.setSolicitariCount(0); // Resetează contorul
+            ghiseu.setPauzaPanaLa(LocalDateTime.now().plusMinutes(1)); // Pune pauza timp de 1 minut
+        }
+
+        ghiseuService.saveGhiseu(ghiseu); // Salvează schimbările
+        return new ResponseEntity<>("Solicitarea documentului a fost înregistrată cu succes.", HttpStatus.OK);
+    }
+
+
+
 }

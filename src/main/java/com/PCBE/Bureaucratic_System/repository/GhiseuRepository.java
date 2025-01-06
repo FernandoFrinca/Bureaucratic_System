@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GhiseuRepository extends JpaRepository<Ghiseu, Integer> {
+
 }

@@ -62,4 +62,11 @@ public class GhiseuService {
         }
         return false;
     }
+
+
+    public void saveGhiseu(Ghiseu ghiseu) {
+        ghiseuRepository.save(ghiseu);
+    }
+
+
 }

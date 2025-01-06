@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Birouri</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            padding: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .birou-button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            width: 200px;
+            transition: background-color 0.3s;
+        }
+
+        .birou-button:hover {
+            background-color: #45a049;
+        }
+
+        .loading {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error {
+            color: red;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<h1>Birouri Disponibile</h1>
+
+<div class="container" id="birouriContainer">
+    <p class="loading">Se încarcă lista de birouri...</p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('birouriContainer');
+
+        // Fetch birouri from the API
+        fetch('/birou/get')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Eroare la preluarea birourilor');
+                }
+                return response.json();
+            })
+            .then(birouri => {
+                container.innerHTML = ''; // Clear loading text
+
+                if (birouri.length === 0) {
+                    container.innerHTML = '<p class="loading">Nu există birouri disponibile.</p>';
+                    return;
+                }
+
+                birouri.forEach((birou, index) => {
+                    const button = document.createElement('a');
+                    button.className = 'birou-button';
+                    button.textContent = `Birou${index + 1}`; // Numerotează fiecare buton
+                    button.href = `clientGhiseu.html?birouId=${birou.id}`; // Trimite ID-ul biroului în URL
+                    container.appendChild(button);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                container.innerHTML = '<p class="error">Eroare la încărcarea birourilor. Încercați din nou mai târziu.</p>';
+            });
+    });
+</script>
+</body>
+</html>
