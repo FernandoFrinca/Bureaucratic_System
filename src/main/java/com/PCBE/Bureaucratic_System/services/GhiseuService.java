@@ -37,21 +37,10 @@ public class GhiseuService {
 
 
     public Optional<Ghiseu> getGhiseuById(int id) {
-        return ghiseuRepository.findById(id);  // Căutăm ghiseul după ID
+        return ghiseuRepository.findById(id);
     }
 
-    // 4. UPDATE - Actualizează un ghiseu existent
-    /*public Ghiseu updateGhiseu(int id, Ghiseu ghiseu) {
-        Optional<Ghiseu> existingGhiseu = ghiseuRepository.findById(id);  // Căutăm ghiseul existent
-        if (existingGhiseu.isPresent()) {
-            Ghiseu ghiseuToUpdate = existingGhiseu.get();
-            ghiseuToUpdate.setTip_de_document_eliberat(ghiseu.getTip_de_document_eliberat());
-            // Poți actualiza și alte câmpuri dacă este necesar
-            return ghiseuRepository.save(ghiseuToUpdate);  // Salvează ghiseul actualizat
-        } else {
-            return null;  // Dacă nu găsim ghiseul, returnăm null
-        }
-    }*/
+
 
 
     public boolean deleteGhiseu(int id) {

@@ -39,10 +39,6 @@ public class GhiseuControler {
     }
 
     @GetMapping("/get")
-    /*@Operation(
-            summary = "Retrieve all counters (ghisee)",
-            description = "Fetches a list of all counters available in the system."
-    )*/
     public ResponseEntity<List<Ghiseu>> getAllGhisee() {
         List<Ghiseu> ghisee = ghiseuService.getAllGhisee();
         return new ResponseEntity<>(ghisee, HttpStatus.OK);
@@ -74,15 +70,14 @@ public class GhiseuControler {
             return new ResponseEntity<>("Ghișeul este în pauză până la: " + ghiseu.getPauzaPanaLa(), HttpStatus.BAD_REQUEST);
         }
 
-        // Incrementare contor de solicitări
         ghiseu.setSolicitariCount(ghiseu.getSolicitariCount() + 1);
 
         if (ghiseu.getSolicitariCount() >= 5) {
-            ghiseu.setSolicitariCount(0); // Resetează contorul
-            ghiseu.setPauzaPanaLa(LocalDateTime.now().plusMinutes(1)); // Pune pauza timp de 1 minut
+            ghiseu.setSolicitariCount(0);
+            ghiseu.setPauzaPanaLa(LocalDateTime.now().plusMinutes(1));
         }
 
-        ghiseuService.saveGhiseu(ghiseu); // Salvează schimbările
+        ghiseuService.saveGhiseu(ghiseu);
         return new ResponseEntity<>("Solicitarea documentului a fost înregistrată cu succes.", HttpStatus.OK);
     }
 

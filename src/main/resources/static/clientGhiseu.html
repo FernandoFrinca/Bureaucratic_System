@@ -96,14 +96,13 @@
     document.addEventListener('DOMContentLoaded', function () {
         const ghiseeContainer = document.getElementById('ghiseeContainer');
         const urlParams = new URLSearchParams(window.location.search);
-        const birouId = urlParams.get('birouId'); // ID-ul biroului din URL
+        const birouId = urlParams.get('birouId');
 
         if (!birouId) {
             ghiseeContainer.innerHTML = '<p class="error">ID-ul biroului nu a fost furnizat!</p>';
             return;
         }
 
-        // Fetch toate ghișeele
         function fetchGhisee() {
             fetch('/ghiseu/get')
                 .then(response => {
@@ -113,9 +112,8 @@
                     return response.json();
                 })
                 .then(ghisee => {
-                    ghiseeContainer.innerHTML = ''; // Clear loading message
+                    ghiseeContainer.innerHTML = '';
 
-                    // Filtrare ghișee după birouId
                     const filteredGhisee = ghisee.filter(ghiseu => ghiseu.birou.id === parseInt(birouId));
 
                     if (filteredGhisee.length === 0) {
@@ -181,7 +179,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ stareGhiseu: !currentStatus }) // Inversează starea
+            body: JSON.stringify({ stareGhiseu: !currentStatus })
         })
             .then(response => {
                 if (!response.ok) {
@@ -191,7 +189,7 @@
             })
             .then(() => {
                 alert('Starea ghișeului a fost actualizată cu succes.');
-                location.reload(); // Reîncarcă pagina pentru actualizarea datelor
+                location.reload();
             })
             .catch(error => {
                 console.error(error);
@@ -207,7 +205,7 @@
             }
         })
             .then(response => {
-                console.log('Răspuns server:', response); // Debugging
+                console.log('Răspuns server:', response);
 
                 if (!response.ok) {
                     return response.text().then(text => {
@@ -215,7 +213,6 @@
                     });
                 }
 
-                // Asigură-te că răspunsul este valid JSON
                 return response.json().catch(err => {
                     throw new Error('Răspunsul nu este un JSON valid.');
                 });
@@ -223,11 +220,11 @@
             .then(() => {
                 showPopup('Documentul a fost solicitat cu succes.');
                 console.log('Solicitarea documentului a fost finalizată.');
-                location.reload(); // Reîncarcă pagina pentru a actualiza starea
+                location.reload();
             })
             .catch(error => {
                 console.error('Eroare la solicitarea documentului:', error);
-                showPopup(error.message, true); // Afișează popup cu mesaj de eroare
+                showPopup(error.message, true);
             });
     }
 

@@ -31,12 +31,10 @@ public class Ghiseu {
     @JoinColumn(name = "birou_id")
     private Birou birou;
 
-    private LocalDateTime pauzaPanaLa; // Nou câmp pentru gestionarea pauzei
+    private LocalDateTime pauzaPanaLa;
     private int solicitariCount = 0;
 
 
-
-    // Constructori
     public Ghiseu(Document tip_de_document_eliberat) {
         this.tip_de_document_eliberat = tip_de_document_eliberat;
         this.stareGhiseu = true;
@@ -47,7 +45,6 @@ public class Ghiseu {
 
     public Ghiseu() {}
 
-    // Getter și setter pentru pauzaPanaLa
     public LocalDateTime getPauzaPanaLa() {
         return pauzaPanaLa;
     }
@@ -56,7 +53,6 @@ public class Ghiseu {
         this.pauzaPanaLa = pauzaPanaLa;
     }
 
-    // Getter și setter pentru stareGhiseu
     public synchronized boolean getStareGhiseu() {
         return stareGhiseu;
     }
@@ -65,7 +61,6 @@ public class Ghiseu {
         this.stareGhiseu = stareGhiseu;
     }
 
-    // Getter pentru numarRandom și contor
     public synchronized int getNumarRandom() {
         return numarRandom;
     }
@@ -74,7 +69,6 @@ public class Ghiseu {
         return contor;
     }
 
-    // Incrementare contor și pauză automată
     public synchronized void incrementeazaContor() {
         try {
             semafor.acquire();
@@ -89,14 +83,13 @@ public class Ghiseu {
         }
     }
 
-    // Logica pentru pauză
     private synchronized void pauzaGhiseu() {
         stareGhiseu = false;
-        pauzaPanaLa = LocalDateTime.now().plusMinutes(1); // Pauză timp de 1 minut
+        pauzaPanaLa = LocalDateTime.now().plusMinutes(1);
         System.out.println("Ghiseul " + tip_de_document_eliberat.getTip() + " este în pauză până la " + pauzaPanaLa);
         new Thread(() -> {
             try {
-                Thread.sleep(60000); // Pauză de 1 minut
+                Thread.sleep(60000);
                 redeschideGhiseu();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -104,7 +97,6 @@ public class Ghiseu {
         }).start();
     }
 
-    // Logica pentru redeschidere
     private synchronized void redeschideGhiseu() {
         stareGhiseu = true;
         pauzaPanaLa = null;
@@ -112,12 +104,10 @@ public class Ghiseu {
         System.out.println("Ghiseul " + tip_de_document_eliberat.getTip() + " s-a redeschis.");
     }
 
-    // Getter pentru tip document eliberat
     public synchronized String getTip_de_document_eliberat() {
         return tip_de_document_eliberat.getTip();
     }
 
-    // Getter și setter pentru ID
     public void setId(int id) {
         this.id = id;
     }
@@ -126,7 +116,6 @@ public class Ghiseu {
         return id;
     }
 
-    // Getter și setter pentru Birou
     public Birou getBirou() {
         return birou;
     }

@@ -16,7 +16,7 @@ public class Birou {
     private int contorListaGhiseuri = 0;
 
     @OneToMany(mappedBy = "birou", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore // Previne includerea în răspunsul JSON
+    @JsonIgnore
     private List<Ghiseu> lista_ghiseuri_din_birou;
     @jakarta.persistence.Id
     private int id;
