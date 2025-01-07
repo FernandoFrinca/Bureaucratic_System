@@ -96,26 +96,20 @@
     document.addEventListener('DOMContentLoaded', function () {
         const ghiseeContainer = document.getElementById('ghiseeContainer');
         const urlParams = new URLSearchParams(window.location.search);
-        const birouId = urlParams.get('birouId'); // ID-ul biroului din URL
+        const birouId = urlParams.get('birouId');
 
         if (!birouId) {
             ghiseeContainer.innerHTML = '<p class="error">ID-ul biroului nu a fost furnizat!</p>';
             return;
         }
 
-        // Fetch toate ghișeele
+        // Fetch ghișee și actualizare stare automat după pauză
         function fetchGhisee() {
             fetch('/ghiseu/get')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Eroare la preluarea ghișeelor');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(ghisee => {
-                    ghiseeContainer.innerHTML = ''; // Clear loading message
+                    ghiseeContainer.innerHTML = '';
 
-                    // Filtrare ghișee după birouId
                     const filteredGhisee = ghisee.filter(ghiseu => ghiseu.birou.id === parseInt(birouId));
 
                     if (filteredGhisee.length === 0) {
@@ -125,7 +119,6 @@
 
                     const table = document.createElement('table');
                     const headerRow = document.createElement('tr');
-
                     headerRow.innerHTML = `
                     <th>ID Ghișeu</th>
                     <th>Tip Document</th>
@@ -136,31 +129,31 @@
 
                     filteredGhisee.forEach(ghiseu => {
                         const row = document.createElement('tr');
-                        const pauzaPanaLa = ghiseu.pauzaPanaLa ? new Date(ghiseu.pauzaPanaLa) : null;
 
                         let pauzaMsg = 'Activ';
-                        if (pauzaPanaLa && new Date() < pauzaPanaLa) {
-                            pauzaMsg = `Pauză până la ${pauzaPanaLa.toLocaleTimeString()}`;
+                        if (ghiseu.pauzaPanaLa) {
+                            const pauzaPanaLa = new Date(ghiseu.pauzaPanaLa);
+                            const now = new Date();
+
+                            if (now < pauzaPanaLa) {
+                                pauzaMsg = `Pauză până la ${pauzaPanaLa.toLocaleTimeString()}`;
+                            } else {
+                                // Actualizează starea în baza de date
+                                updateGhiseuStatus(ghiseu.id, true); // Setează "activ"
+                            }
+                        } else if (!ghiseu.stareGhiseu) {
+                            pauzaMsg = 'Inactiv';
                         }
 
                         row.innerHTML = `
                         <td>${ghiseu.id}</td>
                         <td>${ghiseu.tip_de_document_eliberat || 'N/A'}</td>
-                        <td class="stare-ghiseu" data-id="${ghiseu.id}">${pauzaMsg}</td>
+                        <td>${pauzaMsg}</td>
                         <td>
                             <button class="btn btn-request" onclick="requestDocument(${ghiseu.id})">Solicită Document</button>
                         </td>
                     `;
                         table.appendChild(row);
-                        if (pauzaPanaLa && new Date() < pauzaPanaLa) {
-                            const timeUntilActive = pauzaPanaLa - new Date();
-                            setTimeout(() => {
-                                const stareCell = document.querySelector(`.stare-ghiseu[data-id="${ghiseu.id}"]`);
-                                if (stareCell) {
-                                    stareCell.textContent = 'Activ';
-                                }
-                            }, timeUntilActive);
-                        }
                     });
 
                     ghiseeContainer.appendChild(table);
@@ -171,65 +164,22 @@
                 });
         }
 
+        // Funcție pentru actualizarea stării ghișeului
+        function updateGhiseuStatus(ghiseuId, newStatus) {
+            fetch(`/ghiseu/updateStatus/${ghiseuId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ stareGhiseu: newStatus })
+            }).catch(error => console.error('Eroare la actualizarea stării ghișeului:', error));
+        }
+
+        // Actualizează lista de ghișee la fiecare 30 de secunde
         fetchGhisee();
+        setInterval(fetchGhisee, 30000);
     });
 
-
-    function toggleGhiseu(ghiseuId, currentStatus) {
-        fetch(`/ghiseu/updateStatus/${ghiseuId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ stareGhiseu: !currentStatus }) // Inversează starea
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Eroare la actualizarea stării ghișeului');
-                }
-                return response.json();
-            })
-            .then(() => {
-                alert('Starea ghișeului a fost actualizată cu succes.');
-                location.reload(); // Reîncarcă pagina pentru actualizarea datelor
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Eroare la actualizarea stării ghișeului.');
-            });
-    }
-
-    function requestDocument(ghiseuId) {
-        fetch(`/ghiseu/requestDocument/${ghiseuId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                console.log('Răspuns server:', response); // Debugging
-
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`Eroare server: ${text}`);
-                    });
-                }
-
-                // Asigură-te că răspunsul este valid JSON
-                return response.json().catch(err => {
-                    throw new Error('Răspunsul nu este un JSON valid.');
-                });
-            })
-            .then(() => {
-                showPopup('Documentul a fost solicitat cu succes.');
-                console.log('Solicitarea documentului a fost finalizată.');
-                location.reload(); // Reîncarcă pagina pentru a actualiza starea
-            })
-            .catch(error => {
-                console.error('Eroare la solicitarea documentului:', error);
-                showPopup(error.message, true); // Afișează popup cu mesaj de eroare
-            });
-    }
 
 </script>
 </body>
